@@ -2,12 +2,14 @@
 
 namespace AlexPechkarev\GeometryLibrary;
 
-class Point
-{
-    public float $lat;
-    public float $lng;
+use JsonSerializable;
 
-    public function __construct(float $lat, float $lng)
+class Point implements JsonSerializable
+{
+    public float $lat = 0;
+    public float $lng = 0;
+
+    public function __construct(float $lat = 0, float $lng = 0)
     {
         $this->lat = $lat;
         $this->lng = $lng;
@@ -24,5 +26,10 @@ class Point
             'lat' => $this->lat,
             'lng' => $this->lng,
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
