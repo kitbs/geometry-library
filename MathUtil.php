@@ -27,12 +27,12 @@ class MathUtil
      * Mean radius as defined by IUGG.
      */
 
-    public static $earth_radius = 6371009;
+    public static int $earth_radius = 6371009;
 
     /**
      * Change the earth radius for different earth points
      */
-    public static function changeEarthRadius($newRadius)
+    public static function changeEarthRadius(int $newRadius): void
     {
         self::$earth_radius = $newRadius;
     }
@@ -40,7 +40,7 @@ class MathUtil
     /**
      * Restrict x to the range [low, high].
      */
-    public static function clamp($x, $low, $high)
+    public static function clamp(float $x, float $low, float $high): float
     {
         return $x < $low ? $low : ($x > $high ? $high : $x);
     }
@@ -51,7 +51,7 @@ class MathUtil
      * @param $min The minimum.
      * @param $max The maximum.
      */
-    public static function wrap($n, $min, $max)
+    public static function wrap(float $n, float $min, float $max): float
     {
         return ($n >= $min && $n < $max) ? $n : (self::mod($n - $min, $max - $min) + $min);
     }
@@ -61,7 +61,7 @@ class MathUtil
      * @param $x The operand.
      * @param $m The modulus.
      */
-    public static function mod($x, $m)
+    public static function mod(float $x, float $m): int
     {
         return (($x % $m) + $m) % $m;
     }
@@ -70,7 +70,7 @@ class MathUtil
      * Returns mercator Y corresponding to latitude.
      * See http://en.wikipedia.org/wiki/Mercator_projection .
      */
-    public static function mercator($lat)
+    public static function mercator(float $lat): float
     {
         return log(tan($lat * 0.5 + M_PI/4));
     }
@@ -78,7 +78,7 @@ class MathUtil
     /**
      * Returns latitude from mercator Y.
      */
-    public static function inverseMercator($y)
+    public static function inverseMercator(float $y): float
     {
         return 2 * atan(exp($y)) - M_PI / 2;
     }
@@ -87,9 +87,10 @@ class MathUtil
      * Returns haversine(angle-in-radians).
      * hav(x) == (1 - cos(x)) / 2 == sin(x / 2)^2.
      */
-    public static function hav($x)
+    public static function hav(float $x): float
     {
         $sinHalf = sin($x * 0.5);
+
         return $sinHalf * $sinHalf;
     }
 
@@ -98,36 +99,37 @@ class MathUtil
      * arcHav(x) == acos(1 - 2 * x) == 2 * asin(sqrt(x)).
      * The argument must be in [0, 1], and the result is positive.
      */
-    public static function arcHav($x)
+    public static function arcHav(float $x): float
     {
         return 2 * asin(sqrt($x));
     }
 
     // Given h==hav(x), returns sin(abs(x)).
-    public static function sinFromHav($h)
+    public static function sinFromHav(float $h): float
     {
         return 2 * sqrt($h * (1 - $h));
     }
 
     // Returns hav(asin(x)).
-    public static function havFromSin($x)
+    public static function havFromSin(float $x): float
     {
         $x2 = $x * $x;
         return $x2 / (1 + sqrt(1 - $x2)) * .5;
     }
 
     // Returns sin(arcHav(x) + arcHav(y)).
-    public static function sinSumFromHav($x, $y)
+    public static function sinSumFromHav(float $x, float $y): float
     {
         $a = sqrt($x * (1 - $x));
         $b = sqrt($y * (1 - $y));
+
         return 2 * ($a + $b - 2 * ($a * $y + $b * $x));
     }
 
     /**
      * Returns hav() of distance from (lat1, lng1) to (lat2, lng2) on the unit sphere.
      */
-    public static function havDistance($lat1, $lat2, $dLng)
+    public static function havDistance(float $lat1, float $lat2, float $dLng): float
     {
         return self::hav($lat1 - $lat2) + self::hav($dLng) * cos($lat1) * cos($lat2);
     }

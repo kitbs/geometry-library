@@ -29,7 +29,7 @@ class SphericalUtil
      * expressed in degrees clockwise from North within the range [-180,180).
      * @return float The heading in degrees clockwise from north.
      */
-    public static function computeHeading($from, $to)
+    public static function computeHeading($from, $to): float
     {
         // http://williams.best.vwh.net/avform.htm#Crs
         $fromLat = deg2rad($from['lat']);
@@ -53,7 +53,7 @@ class SphericalUtil
      * @param $distance The distance to travel.
      * @param $heading  The heading in degrees clockwise from north.
      */
-    public static function computeOffset($from, $distance, $heading)
+    public static function computeOffset($from, float $distance, float $heading)
     {
         $distance /= MathUtil::$earth_radius;
         $heading = deg2rad($heading);
@@ -82,7 +82,7 @@ class SphericalUtil
      * @param $distance The distance travelled, in meters.
      * @param $heading  The heading in degrees clockwise from north.
      */
-    public static function computeOffsetOrigin($to, $distance, $heading)
+    public static function computeOffsetOrigin($to, float $distance, float $heading)
     {
         $heading = deg2rad($heading);
         $distance /= MathUtil::$earth_radius;
@@ -128,7 +128,7 @@ class SphericalUtil
      * @param float $fraction A fraction of the distance to travel.
      * @return array The interpolated LatLng.
      */
-    public static function interpolate($from, $to, $fraction)
+    public static function interpolate($from, $to, float $fraction)
     {
         // http://en.wikipedia.org/wiki/Slerp
         $fromLat = deg2rad($from['lat']);
@@ -162,7 +162,7 @@ class SphericalUtil
     /**
      * Returns distance on the unit sphere; the arguments are in radians.
      */
-    private static function distanceRadians($lat1, $lng1, $lat2, $lng2)
+    protected static function distanceRadians(float $lat1, float $lng1, float $lat2, float $lng2): float
     {
         return MathUtil::arcHav(MathUtil::havDistance($lat1, $lat2, $lng1 - $lng2));
     }
@@ -171,7 +171,7 @@ class SphericalUtil
      * Returns the angle between two LatLngs, in radians. This is the same as the distance
      * on the unit sphere.
      */
-    private static function computeAngleBetween($from, $to)
+    protected static function computeAngleBetween($from, $to): float
     {
         return self::distanceRadians(
             deg2rad($from['lat']),
@@ -181,20 +181,18 @@ class SphericalUtil
         );
     }
 
-
     /**
      * Returns the distance between two LatLngs, in meters.
      */
-    public static function computeDistanceBetween($from, $to)
+    public static function computeDistanceBetween($from, $to): float
     {
         return self::computeAngleBetween($from, $to) * MathUtil::$earth_radius;
     }
 
-
     /**
      * Returns the length of the given path, in meters, on Earth.
      */
-    public static function computeLength($path)
+    public static function computeLength($path): float
     {
         if (count($path) < 2) {
             return 0;
@@ -219,11 +217,10 @@ class SphericalUtil
      * @param $path A closed path.
      * @return float The path's area in square meters.
      */
-    public static function computeArea($path)
+    public static function computeArea($path): float
     {
         return abs(self::computeSignedArea($path));
     }
-
 
     /**
      * Returns the signed area of a closed path on Earth. The sign of the area may be used to
@@ -232,7 +229,7 @@ class SphericalUtil
      * @param $path A closed path.
      * @return float The loop's area in square meters.
      */
-    public static function computeSignedArea($path)
+    public static function computeSignedArea($path): float
     {
         return self::computeSignedAreaP($path, MathUtil::$earth_radius);
     }
@@ -242,7 +239,7 @@ class SphericalUtil
      * The computed area uses the same units as the radius squared.
      * Used by SphericalUtilTest.
      */
-    private static function computeSignedAreaP($path, $radius)
+    protected static function computeSignedAreaP($path, $radius): float
     {
         $size = count($path);
         if ($size < 3) {
@@ -272,10 +269,12 @@ class SphericalUtil
      * See http://books.google.com/books?id=3uBHAAAAIAAJ&pg=PA71
      * The arguments named "tan" are tan((pi/2 - latitude)/2).
      */
-    private static function polarTriangleArea($tan1, $lng1, $tan2, $lng2)
+    protected static function polarTriangleArea(float $tan1, float $lng1, float $tan2, float $lng2): float
     {
         $deltaLng = $lng1 - $lng2;
+
         $t = $tan1 * $tan2;
+
         return 2 * atan2($t * sin($deltaLng), 1 + $t * cos($deltaLng));
     }
 }
