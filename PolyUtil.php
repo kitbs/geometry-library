@@ -11,7 +11,7 @@ namespace GeometryLibrary;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,30 +55,38 @@ class PolyUtil
         if (($lng3 >= 0 && $lng3 >= $lng2) || ($lng3 < 0 && $lng3 < $lng2)) {
             return false;
         }
+
         // Point is South Pole.
         if ($lat3 <= -M_PI / 2) {
             return false;
         }
+
         // Any segment end is a pole.
         if ($lat1 <= -M_PI / 2 || $lat2 <= -M_PI / 2 || $lat1 >= M_PI / 2 || $lat2 >= M_PI / 2) {
             return false;
         }
+
         if ($lng2 <= -M_PI) {
             return false;
         }
+
         $linearLat = ($lat1 * ($lng2 - $lng3) + $lat2 * $lng3) / $lng2;
+
         // Northern hemisphere and point under lat-lng line.
         if ($lat1 >= 0 && $lat2 >= 0 && $lat3 < $linearLat) {
             return false;
         }
+
         // Southern hemisphere and point above lat-lng line.
         if ($lat1 <= 0 && $lat2 <= 0 && $lat3 >= $linearLat) {
             return true;
         }
+
         // North Pole.
         if ($lat3 >= M_PI / 2) {
             return true;
         }
+
         // Compare lat3 with latitude on the GC/Rhumb segment corresponding to lng3.
         // Compare through a strictly-increasing function (tan() or mercator()) as convenient.
         return $geodesic ?
@@ -142,7 +150,6 @@ class PolyUtil
         return self::isLocationOnEdgeOrPath($point, $polygon, true, $geodesic, $tolerance);
     }
 
-
     /**
      * Computes whether the given point lies on or near a polyline, within a specified
      * tolerance in meters. The polyline is composed of great circle segments if geodesic
@@ -153,7 +160,6 @@ class PolyUtil
     {
         return self::isLocationOnEdgeOrPath($point, $polyline, false, $geodesic, $tolerance);
     }
-
 
     private static function isLocationOnEdgeOrPath($point, $poly, $closed, $geodesic, $toleranceEarth)
     {
@@ -226,8 +232,6 @@ class PolyUtil
         return false;
     }
 
-
-
     /**
      * Returns sin(initial bearing from (lat1,lng1) to (lat3,lng3) minus initial bearing
      * from (lat1, lng1) to (lat2,lng2)).
@@ -248,7 +252,6 @@ class PolyUtil
         $denom = ($a * $a + $b * $b) * ($c * $c + $d * $d);
         return $denom <= 0 ? 1 : ($a * $d - $b * $c) / sqrt($denom);
     }
-
 
     private static function isOnSegmentGC($lat1, $lng1, $lat2, $lng2, $lat3, $lng3, $havTolerance)
     {
@@ -284,12 +287,11 @@ class PolyUtil
     /**
      * Computes the distance on the sphere between the point p and the line segment start to end.
      *
-     * @param $p the point to be measured
-     * @param $start the beginning of the line segment
-     * @param $end the end of the line segment
-     * @return $the distance in meters (assuming spherical earth)
+     * @param $p The point to be measured
+     * @param $start The beginning of the line segment
+     * @param $end The end of the line segment
+     * @return float The distance in meters (assuming spherical earth)
      */
-
     public static function distanceToLine($p, $start, $end)
     {
         if ($start == $end) {
@@ -333,7 +335,7 @@ class PolyUtil
         while ($index < $len) {
             $result = 1;
             $shift = 0;
-            $b;
+            $b = 0;
             do {
                 $b = ord($encodedPath[$index++]) - 63 - 1;
                 $result += $b << $shift;
