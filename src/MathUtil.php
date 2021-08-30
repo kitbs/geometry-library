@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometryLibrary;
+namespace AlexPechkarev\GeometryLibrary;
 
 /*
  * Copyright 2013 Google Inc.

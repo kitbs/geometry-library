@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometryLibrary;
+namespace AlexPechkarev\GeometryLibrary;
 
 /*
  * Copyright 2013 Google Inc.
@@ -19,9 +19,6 @@ namespace GeometryLibrary;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-use GeometryLibrary\MathUtil;
-use GeometryLibrary\SphericalUtil;
 
 class PolyUtil
 {
@@ -103,7 +100,7 @@ class PolyUtil
      * The polygon is formed of great circle segments if geodesic is true, and of rhumb
      * (loxodromic) segments otherwise.
      */
-    public static function containsLocation($point, $polygon, bool $geodesic = false): bool
+    public static function containsLocation(Point $point, Path $polygon, bool $geodesic = false): bool
     {
         $size = count($polygon);
 
@@ -111,11 +108,11 @@ class PolyUtil
             return false;
         }
 
-        $lat3 = deg2rad($point['lat']);
-        $lng3 = deg2rad($point['lng']);
+        $lat3 = deg2rad($point->lat);
+        $lng3 = deg2rad($point->lng);
         $prev = $polygon[$size - 1];
-        $lat1 = deg2rad($prev['lat']);
-        $lng1 = deg2rad($prev['lng']);
+        $lat1 = deg2rad($prev->lat);
+        $lng1 = deg2rad($prev->lng);
 
         $nIntersect = 0;
 
@@ -126,8 +123,8 @@ class PolyUtil
                 return true;
             }
 
-            $lat2 = deg2rad($val['lat']);
-            $lng2 = deg2rad($val['lng']);
+            $lat2 = deg2rad($val->lat);
+            $lng2 = deg2rad($val->lng);
 
             // Offset longitudes by -lng1.
             if (self::intersects($lat1, $lat2, MathUtil::wrap($lng2 - $lng1, -M_PI, M_PI), $lat3, $dLng3, $geodesic)) {
@@ -146,7 +143,7 @@ class PolyUtil
      * is true, and of Rhumb segments otherwise. The polygon edge is implicitly closed -- the
      * closing segment between the first point and the last point is included.
      */
-    public static function isLocationOnEdge($point, $polygon, float $tolerance = self::DEFAULT_TOLERANCE, bool $geodesic = true): bool
+    public static function isLocationOnEdge(Point $point, Path $polygon, float $tolerance = self::DEFAULT_TOLERANCE, bool $geodesic = true): bool
     {
         return self::isLocationOnEdgeOrPath($point, $polygon, true, $geodesic, $tolerance);
     }
@@ -157,12 +154,12 @@ class PolyUtil
      * is true, and of Rhumb segments otherwise. The polyline is not closed -- the closing
      * segment between the first point and the last point is not included.
      */
-    public static function isLocationOnPath($point, $polyline, float $tolerance = self::DEFAULT_TOLERANCE, bool $geodesic = true): bool
+    public static function isLocationOnPath(Point $point, Path $polyline, float $tolerance = self::DEFAULT_TOLERANCE, bool $geodesic = true): bool
     {
         return self::isLocationOnEdgeOrPath($point, $polyline, false, $geodesic, $tolerance);
     }
 
-    protected static function isLocationOnEdgeOrPath($point, $poly, $closed, bool $geodesic, float $toleranceEarth): bool
+    protected static function isLocationOnEdgeOrPath(Point $point, Path $poly, bool $closed, bool $geodesic, float $toleranceEarth): bool
     {
         $size = count($poly);
 
@@ -174,16 +171,16 @@ class PolyUtil
 
         $havTolerance = MathUtil::hav($tolerance);
 
-        $lat3 = deg2rad($point['lat']);
-        $lng3 = deg2rad($point['lng']);
+        $lat3 = deg2rad($point->lat);
+        $lng3 = deg2rad($point->lng);
         $prev = !empty($closed) ? $poly[$size - 1] : $poly[0];
-        $lat1 = deg2rad($prev['lat']);
-        $lng1 = deg2rad($prev['lng']);
+        $lat1 = deg2rad($prev->lat);
+        $lng1 = deg2rad($prev->lng);
 
         if ($geodesic) {
             foreach ($poly as $val) {
-                $lat2 = deg2rad($val['lat']);
-                $lng2 = deg2rad($val['lng']);
+                $lat2 = deg2rad($val->lat);
+                $lng2 = deg2rad($val->lng);
                 if (self::isOnSegmentGC($lat1, $lng1, $lat2, $lng2, $lat3, $lng3, $havTolerance)) {
                     return true;
                 }
@@ -191,7 +188,7 @@ class PolyUtil
                 $lng1 = $lng2;
             }
         } else {
-            // We project the points to mercator space, where the Rhumb segment is a straight line,
+            // We project the points to Mercator space, where the Rhumb segment is a straight line,
             // and compute the geodesic distance between point3 and the closest point on the
             // segment. This method is an approximation, because it uses "closest" in mercator
             // space which is not "closest" on the sphere -- but the error is small because
@@ -202,9 +199,9 @@ class PolyUtil
             $y3 = MathUtil::mercator($lat3);
             $xTry = [];
             foreach ($poly as $val) {
-                $lat2 = deg2rad($val['lat']);
+                $lat2 = deg2rad($val->lat);
                 $y2 = MathUtil::mercator($lat2);
-                $lng2 = deg2rad($val['lng']);
+                $lng2 = deg2rad($val->lng);
                 if (max($lat1, $lat2) >= $minAcceptable && min($lat1, $lat2) <= $maxAcceptable) {
                     // We offset longitudes by -lng1; the implicit x1 is 0.
                     $x2 = MathUtil::wrap($lng2 - $lng1, -M_PI, M_PI);
@@ -309,18 +306,18 @@ class PolyUtil
      * @param $end The end of the line segment
      * @return float The distance in meters (assuming spherical earth)
      */
-    public static function distanceToLine($p, $start, $end): float
+    public static function distanceToLine(Point $p, Point $start, Point $end): float
     {
         if ($start == $end) {
             return SphericalUtil::computeDistanceBetween($end, $p);
         }
 
-        $s0lat = deg2rad($p['lat']);
-        $s0lng = deg2rad($p['lng']);
-        $s1lat = deg2rad($start['lat']);
-        $s1lng = deg2rad($start['lng']);
-        $s2lat = deg2rad($end['lat']);
-        $s2lng = deg2rad($end['lng']);
+        $s0lat = deg2rad($p->lat);
+        $s0lng = deg2rad($p->lng);
+        $s1lat = deg2rad($start->lat);
+        $s1lng = deg2rad($start->lng);
+        $s2lat = deg2rad($end->lat);
+        $s2lng = deg2rad($end->lng);
 
         $s2s1lat = $s2lat - $s1lat;
         $s2s1lng = $s2lng - $s1lng;
@@ -332,19 +329,19 @@ class PolyUtil
         if ($u >= 1) {
             return SphericalUtil::computeDistanceBetween($p, $end);
         }
-        $su = ['lat' => $start['lat'] + $u * ($end['lat'] - $start['lat']), 'lng' => $start['lng'] + $u * ($end['lng'] - $start['lng'])];
+        $su = ['lat' => $start->lat + $u * ($end->lat - $start->lat), 'lng' => $start->lng + $u * ($end->lng - $start->lng)];
         return SphericalUtil::computeDistanceBetween($p, $su);
     }
 
     /**
      * Decodes an encoded path string into a sequence of LatLngs.
      */
-    public static function decode(string $encodedPath): array
+    public static function decode(string $encodedPath): Path
     {
         $len = strlen($encodedPath) - 1;
         // For speed we preallocate to an upper bound on the final length, then
         // truncate the array before returning.
-        $path = [];
+        $path = new Path();
         $index = 0;
         $lat = 0;
         $lng = 0;
@@ -353,6 +350,7 @@ class PolyUtil
             $result = 1;
             $shift = 0;
             $b = 0;
+
             do {
                 $b = ord($encodedPath[$index++]) - 63 - 1;
                 $result += $b << $shift;
@@ -363,14 +361,18 @@ class PolyUtil
 
             $result = 1;
             $shift = 0;
+
             do {
                 $b = ord($encodedPath[$index++]) - 63 - 1;
                 $result += $b << $shift;
                 $shift += 5;
             } while ($b >= hexdec("0x1f"));
+
             $lng += ($result & 1) != 0 ? ~($result >> 1) : ($result >> 1);
 
-            array_push($path, ['lat' => $lat * 1e-5, 'lng' => $lng * 1e-5]);
+            $point = new Point($lat * 1e-5, $lng * 1e-5);
+
+            $path->addPoint($point);
         }
 
         return $path;
@@ -380,7 +382,7 @@ class PolyUtil
     /**
      * Encodes a sequence of LatLngs into an encoded path string.
      */
-    public static function encode($path): string
+    public static function encode(Path $path): string
     {
         $lastLat = 0;
         $lastLng = 0;
@@ -388,8 +390,8 @@ class PolyUtil
         $result = '';
 
         foreach ($path as $point) {
-            $lat = round($point['lat'] * 1e5);
-            $lng = round($point['lng'] * 1e5);
+            $lat = round($point->lat * 1e5);
+            $lng = round($point->lng * 1e5);
 
             $dLat = $lat - $lastLat;
             $dLng = $lng - $lastLng;
@@ -404,7 +406,7 @@ class PolyUtil
         return $result;
     }
 
-    protected static function enc($v): string
+    protected static function enc(float $v): string
     {
         $v = $v < 0 ? ~($v << 1) : $v << 1;
 
