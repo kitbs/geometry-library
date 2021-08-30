@@ -1,6 +1,6 @@
 <?php
 
-namespace AlexPechkarev\GeometryLibrary;
+namespace AlexPechkarev\Geometry;
 
 use JsonSerializable;
 

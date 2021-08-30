@@ -1,11 +1,11 @@
 <?php
 
-namespace AlexPechkarev\GeometryLibrary;
+namespace AlexPechkarev\Geometry;
 
 /*
  * Copyright 2013 Google Inc.
  *
- * https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/PolyUtil.java
+ * https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/Polyline.java
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace AlexPechkarev\GeometryLibrary;
  * limitations under the License.
  */
 
-class PolyUtil
+class Polyline
 {
     public const DEFAULT_TOLERANCE = 0.1;  // meters.
 
@@ -38,7 +38,7 @@ class PolyUtil
      */
     protected static function mercatorLatRhumb(float $lat1, float $lat2, float $lng2, float $lng3): float
     {
-        return (MathUtil::mercator($lat1) * ($lng2 - $lng3) + MathUtil::mercator($lat2) * $lng3) / $lng2;
+        return (Math::mercator($lat1) * ($lng2 - $lng3) + Math::mercator($lat2) * $lng3) / $lng2;
     }
 
     /**
@@ -88,7 +88,7 @@ class PolyUtil
         // Compare through a strictly-increasing function (tan() or mercator()) as convenient.
         return $geodesic ?
             tan($lat3) >= self::tanLatGC($lat1, $lat2, $lng2, $lng3) :
-            MathUtil::mercator($lat3) >= self::mercatorLatRhumb($lat1, $lat2, $lng2, $lng3);
+            Math::mercator($lat3) >= self::mercatorLatRhumb($lat1, $lat2, $lng2, $lng3);
     }
 
 
@@ -117,7 +117,7 @@ class PolyUtil
         $nIntersect = 0;
 
         foreach ($polygon as $key => $val) {
-            $dLng3 = MathUtil::wrap($lng3 - $lng1, -M_PI, M_PI);
+            $dLng3 = Math::wrap($lng3 - $lng1, -M_PI, M_PI);
             // Special case: point equal to vertex is inside.
             if ($lat3 == $lat1 && $dLng3 == 0) {
                 return true;
@@ -127,7 +127,7 @@ class PolyUtil
             $lng2 = deg2rad($val->lng);
 
             // Offset longitudes by -lng1.
-            if (self::intersects($lat1, $lat2, MathUtil::wrap($lng2 - $lng1, -M_PI, M_PI), $lat3, $dLng3, $geodesic)) {
+            if (self::intersects($lat1, $lat2, Math::wrap($lng2 - $lng1, -M_PI, M_PI), $lat3, $dLng3, $geodesic)) {
                 ++$nIntersect;
             }
             $lat1 = $lat2;
@@ -167,9 +167,9 @@ class PolyUtil
             return false;
         }
 
-        $tolerance = $toleranceEarth / MathUtil::$earth_radius;
+        $tolerance = $toleranceEarth / Math::$earth_radius;
 
-        $havTolerance = MathUtil::hav($tolerance);
+        $havTolerance = Math::hav($tolerance);
 
         $lat3 = deg2rad($point->lat);
         $lng3 = deg2rad($point->lng);
@@ -195,17 +195,17 @@ class PolyUtil
             // "tolerance" is small.
             $minAcceptable = $lat3 - $tolerance;
             $maxAcceptable = $lat3 + $tolerance;
-            $y1 = MathUtil::mercator($lat1);
-            $y3 = MathUtil::mercator($lat3);
+            $y1 = Math::mercator($lat1);
+            $y3 = Math::mercator($lat3);
             $xTry = [];
             foreach ($poly as $val) {
                 $lat2 = deg2rad($val->lat);
-                $y2 = MathUtil::mercator($lat2);
+                $y2 = Math::mercator($lat2);
                 $lng2 = deg2rad($val->lng);
                 if (max($lat1, $lat2) >= $minAcceptable && min($lat1, $lat2) <= $maxAcceptable) {
                     // We offset longitudes by -lng1; the implicit x1 is 0.
-                    $x2 = MathUtil::wrap($lng2 - $lng1, -M_PI, M_PI);
-                    $x3Base = MathUtil::wrap($lng3 - $lng1, -M_PI, M_PI);
+                    $x2 = Math::wrap($lng2 - $lng1, -M_PI, M_PI);
+                    $x3Base = Math::wrap($lng3 - $lng1, -M_PI, M_PI);
                     $xTry[0] = $x3Base;
                     // Also explore wrapping of x3Base around the world in both directions.
                     $xTry[1] = $x3Base + 2 * M_PI;
@@ -214,11 +214,11 @@ class PolyUtil
                     foreach ($xTry as $x3) {
                         $dy = $y2 - $y1;
                         $len2 = $x2 * $x2 + $dy * $dy;
-                        $t = $len2 <= 0 ? 0 : MathUtil::clamp(($x3 * $x2 + ($y3 - $y1) * $dy) / $len2, 0, 1);
+                        $t = $len2 <= 0 ? 0 : Math::clamp(($x3 * $x2 + ($y3 - $y1) * $dy) / $len2, 0, 1);
                         $xClosest = $t * $x2;
                         $yClosest = $y1 + $t * $dy;
-                        $latClosest = MathUtil::inverseMercator($yClosest);
-                        $havDist = MathUtil::havDistance($lat3, $latClosest, $x3 - $xClosest);
+                        $latClosest = Math::inverseMercator($yClosest);
+                        $havDist = Math::havDistance($lat3, $latClosest, $x3 - $xClosest);
                         if ($havDist < $havTolerance) {
                             return true;
                         }
@@ -249,8 +249,8 @@ class PolyUtil
 
         $a = sin($lng31) * $cosLat3;
         $c = sin($lng21) * $cosLat2;
-        $b = sin($lat31) + 2 * $sinLat1 * $cosLat3 * MathUtil::hav($lng31);
-        $d = sin($lat21) + 2 * $sinLat1 * $cosLat2 * MathUtil::hav($lng21);
+        $b = sin($lat31) + 2 * $sinLat1 * $cosLat3 * Math::hav($lng31);
+        $d = sin($lat21) + 2 * $sinLat1 * $cosLat2 * Math::hav($lng21);
 
         $denom = ($a * $a + $b * $b) * ($c * $c + $d * $d);
 
@@ -259,27 +259,27 @@ class PolyUtil
 
     protected static function isOnSegmentGC(float $lat1, float $lng1, float $lat2, float $lng2, float $lat3, float $lng3, float $havTolerance): float
     {
-        $havDist13 = MathUtil::havDistance($lat1, $lat3, $lng1 - $lng3);
+        $havDist13 = Math::havDistance($lat1, $lat3, $lng1 - $lng3);
 
         if ($havDist13 <= $havTolerance) {
             return true;
         }
 
-        $havDist23 = MathUtil::havDistance($lat2, $lat3, $lng2 - $lng3);
+        $havDist23 = Math::havDistance($lat2, $lat3, $lng2 - $lng3);
 
         if ($havDist23 <= $havTolerance) {
             return true;
         }
 
         $sinBearing = self::sinDeltaBearing($lat1, $lng1, $lat2, $lng2, $lat3, $lng3);
-        $sinDist13 = MathUtil::sinFromHav($havDist13);
-        $havCrossTrack = MathUtil::havFromSin($sinDist13 * $sinBearing);
+        $sinDist13 = Math::sinFromHav($havDist13);
+        $havCrossTrack = Math::havFromSin($sinDist13 * $sinBearing);
 
         if ($havCrossTrack > $havTolerance) {
             return false;
         }
 
-        $havDist12 = MathUtil::havDistance($lat1, $lat2, $lng1 - $lng2);
+        $havDist12 = Math::havDistance($lat1, $lat2, $lng1 - $lng2);
         $term = $havDist12 + $havCrossTrack * (1 - 2 * $havDist12);
 
         if ($havDist13 > $term || $havDist23 > $term) {
@@ -293,7 +293,7 @@ class PolyUtil
         $cosCrossTrack = 1 - 2 * $havCrossTrack;
         $havAlongTrack13 = ($havDist13 - $havCrossTrack) / $cosCrossTrack;
         $havAlongTrack23 = ($havDist23 - $havCrossTrack) / $cosCrossTrack;
-        $sinSumAlongTrack = MathUtil::sinSumFromHav($havAlongTrack13, $havAlongTrack23);
+        $sinSumAlongTrack = Math::sinSumFromHav($havAlongTrack13, $havAlongTrack23);
 
         return $sinSumAlongTrack > 0;  // Compare with half-circle == PI using sign of sin().
     }
@@ -309,7 +309,7 @@ class PolyUtil
     public static function distanceToLine(Point $p, Point $start, Point $end): float
     {
         if ($start == $end) {
-            return SphericalUtil::computeDistanceBetween($end, $p);
+            return Sphere::computeDistanceBetween($end, $p);
         }
 
         $s0lat = deg2rad($p->lat);
@@ -324,13 +324,13 @@ class PolyUtil
         $u = (($s0lat - $s1lat) * $s2s1lat + ($s0lng - $s1lng) * $s2s1lng)
             / ($s2s1lat * $s2s1lat + $s2s1lng * $s2s1lng);
         if ($u <= 0) {
-            return SphericalUtil::computeDistanceBetween($p, $start);
+            return Sphere::computeDistanceBetween($p, $start);
         }
         if ($u >= 1) {
-            return SphericalUtil::computeDistanceBetween($p, $end);
+            return Sphere::computeDistanceBetween($p, $end);
         }
         $su = ['lat' => $start->lat + $u * ($end->lat - $start->lat), 'lng' => $start->lng + $u * ($end->lng - $start->lng)];
-        return SphericalUtil::computeDistanceBetween($p, $su);
+        return Sphere::computeDistanceBetween($p, $su);
     }
 
     /**

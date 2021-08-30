@@ -1,6 +1,5 @@
 ## Geometry Library Google Maps API V3 
-PHP Geometry Library provides utility functions for the computation of geometric data on the surface of the Earth. Code ported from Google [Maps Android API](https://github.com/googlemaps/android-maps-utils/).
-
+PHP Geometry Library provides utility functions for the computation of geometric data on the surface of the Earth. Code ported from Google [Maps Android API](https://github.com/googlemaps/android-maps-utils/) and improved for PHP.
 
 Features
 ------------
@@ -10,117 +9,109 @@ Features
 
 Dependency
 ------------
-* [PHP 5](http://php.net/)
-
-
+* [PHP 8.0](http://php.net/)
 
 Installation
 ------------
 
 Issue following command:
 
-```php
-composer require alexpechkarev/geometry-library:1.0.2
-```
-
-Alternatively  edit composer.json by adding following line and run **`composer update`**
-```php
-"require": { 
-		....,
-		"alexpechkarev/geometry-library":"1.0.2",
-	
-	},
+```bash
+composer require alexpechkarev/geometry-library
 ```
 
 Usage
 ------------
 
-Here is an example of using GeometryLibrary:
+Here is an example of using Geometry:
 ```php
-$response =  \GeometryLibrary\SphericalUtil::computeHeading(
-                ['lat' => 25.775, 'lng' => -80.190], // from array [lat, lng]
-                ['lat' => 21.774, 'lng' => -80.190]); // to array [lat, lng]
-  echo $response; // -180
-  
-$response = \GeometryLibrary\SphericalUtil::computeDistanceBetween(
-              ['lat' => 25.775, 'lng' => -80.190], //from array [lat, lng]
-              ['lat' => 21.774, 'lng' => -80.190]); // to array [lat, lng]
-              
-  echo $response; // 444891.52998049          
-  
-  
-$response =  \GeometryLibrary\PolyUtil::isLocationOnEdge(
-              ['lat' => 25.774, 'lng' => -80.190], // point array [lat, lng]
-              [ // poligon arrays of [lat, lng]
-                ['lat' => 25.774, 'lng' => -80.190], 
-                ['lat' => 18.466, 'lng' => -66.118], 
-                ['lat' => 32.321, 'lng' => -64.757]
-              ])  ;
-              
-  echo $response; // true
-  
-  
-  
-$response =  \GeometryLibrary\PolyUtil::isLocationOnPath(
-              ['lat' => 25.771, 'lng' => -80.190], // point array [lat, lng]
-             [ // poligon arrays of [lat, lng]
-              ['lat' => 25.774, 'lng' => -80.190], 
-              ['lat' => 18.466, 'lng' => -66.118], 
-              ['lat' => 32.321, 'lng' => -64.757]
-             ]);  
-             
-  echo $response; // false  
-  
-$response =  \GeometryLibrary\PolyUtil::containsLocation(
-              ['lat' => 23.886, 'lng' => -65.269], // point array [lat, lng]
-             [ // poligon arrays of [lat, lng]
-                ['lat' => 25.774, 'lng' => -80.190], 
-                ['lat' => 18.466, 'lng' => -66.118], 
-                ['lat' => 32.321, 'lng' => -64.757]
-             ]);  
-             
-  echo $response; // false    
-  
-$response =  \GeometryLibrary\PolyUtil::distanceToLine(
-              ['lat' => 61.387002, 'lng' => 23.890636], // point array [lat, lng]
-              ['lat' => 61.487002, 'lng' => 23.790636], // line startpoint array [lat, lng]
-              ['lat' => 60.48047, 'lng' => 22.052754] // line endpoint array [lat, lng]
-             );  
-             
-  echo $response; // 12325.124046196 in meters
-  
-$response =  \GeometryLibrary\PolyUtil::encode(
-              [ 
-                ['lat' => 38.5, 'lng' => -120.2], 
-                ['lat' => 40.7, 'lng' => -120.95], 
-                ['lat' => 43.252, 'lng' => -126.453]
-              ]);
-              
-  echo $response; // '_p~iF~ps|U_ulLnnqC_mqNvxq`@'
-  
-  
-$response =  \GeometryLibrary\PolyUtil::decode('_p~iF~ps|U_ulLnnqC_mqNvxq`@');  
 
-  echo $response; /** array (size=3)
-                        0 => 
-                          array (size=2)
-                            'lat' => float 38.5
-                            'lng' => float -120.2
-                        1 => 
-                          array (size=2)
-                            'lat' => float 40.7
-                            'lng' => float -120.95
-                        2 => 
-                          array (size=2)
-                            'lat' => float 43.252
-                            'lng' => float -126.453
-                   */
-  
+use AlexPechkarev\Geometry\Sphere;
+use AlexPechkarev\Geometry\Polyline;
+use AlexPechkarev\Geometry\Path;
+use AlexPechkarev\Geometry\Point;
+
+$response = Sphere::computeHeading(
+    new Point(25.775, -80.190),
+    new Point(21.774, -80.190)
+);
+
+echo $response; // -180
+
+$response = Sphere::computeDistanceBetween(
+    new Point(25.775, -80.190),
+    new Point(21.774, -80.190)
+);
+
+echo $response; // 444891.52998049          
+
+$response = Polyline::isLocationOnEdge(
+    new Point(25.774, -80.190),
+    new Path([
+        new Point(25.774, -80.190),
+        new Point(18.466, -66.118),
+        new Point(32.321, -64.757)
+    ])
+);
+
+echo $response; // true
+
+$response = Polyline::isLocationOnPath(
+    new Point(25.771, -80.190),
+    new Path([
+        new Point(25.774, -80.190),
+        new Point(18.466, -66.118),
+        new Point(32.321, -64.757)
+    ])
+);
+
+echo $response; // false  
+
+$response =  Polyline::containsLocation(
+    new Point(23.886, -65.269),
+    new Path([
+        new Point(25.774, -80.190),
+        new Point(18.466, -66.118),
+        new Point(32.321, -64.757)
+    ])
+);
+
+echo $response; // false    
+
+$response =  Polyline::distanceToLine(
+    new Point(61.387002, 23.890636),
+    new Point(61.487002, 23.790636),
+    new Point(60.48047, 22.052754)
+);
+
+echo $response; // 12325.124046196 in meters
+
+$response = Polyline::encode(
+    new Path([
+        new Point(38.5, -120.2),
+        new Point(40.7, -120.95),
+        new Point(43.252, -126.453)
+    ])
+);
+
+echo $response; // '_p~iF~ps|U_ulLnnqC_mqNvxq`@'
+
+$response = Polyline::decode('_p~iF~ps|U_ulLnnqC_mqNvxq`@');
+
+echo $response;
+/**
+ * new Path([
+ *   new Point(38.5, -120.2),
+ *   new Point(40.7, -120.95),
+ *   new Point(43.252, -126.453),
+ * ])
+ */
+
 ```
 
 Available methods
 ------------
-## PolyUtil class
+## Polyline class
 * [`containsLocation($point, $polygon, $geodesic = false)`](#containsLocation)
 * [`isLocationOnEdge($point, $polygon, $tolerance = self::DEFAULT_TOLERANCE, $geodesic = true)`](#isLocationOnEdge)
 * [`isLocationOnPath($point, $polyline, $tolerance = self::DEFAULT_TOLERANCE, $geodesic = true)`](#isLocationOnPath)
@@ -128,7 +119,7 @@ Available methods
 * [`decode($encodedPath)`](#decode)
 * [`encode($path)`](#encode)
 
-## SphericalUtil class
+## Sphere class
 * [`computeHeading($from, $to)`](#computeHeading)
 * [`computeOffset($from, $distance, $heading)`](#computeOffset)
 * [`computeOffsetOrigin($to, $distance,  $heading)`](#computeOffsetOrigin)
@@ -137,7 +128,6 @@ Available methods
 * [`computeLength($path)`](#computeLength)
 * [`computeArea($path)`](#computeArea)
 * [`computeSignedArea($path)`](#computeSignedArea)
-
 
 ---
 
@@ -152,7 +142,7 @@ Returns boolean
 
 ```php
 
-$response =  \GeometryLibrary\PolyUtil::containsLocation(
+$response =  AlexPechkarev\Geometry\Polyline::containsLocation(
               ['lat' => 23.886, 'lng' => -65.269], // point array [lat, lng]
              [ // poligon arrays of [lat, lng]
                 ['lat' => 25.774, 'lng' => -80.190], 
@@ -178,7 +168,7 @@ Returns boolean
 
 ```php
 
-$response =  \GeometryLibrary\PolyUtil::isLocationOnEdge(
+$response =  AlexPechkarev\Geometry\Polyline::isLocationOnEdge(
               ['lat' => 25.774, 'lng' => -80.190], // point array [lat, lng]
               [ // poligon arrays of [lat, lng]
                 ['lat' => 25.774, 'lng' => -80.190], 
@@ -203,7 +193,7 @@ Returns boolean
 
 ```php
 
-$response =  \GeometryLibrary\PolyUtil::isLocationOnPath(
+$response =  AlexPechkarev\Geometry\Polyline::isLocationOnPath(
               ['lat' => 25.774, 'lng' => -80.190], // point array [lat, lng]
               [ // poligon arrays of [lat, lng]
                 ['lat' => 25.774, 'lng' => -80.190], 
@@ -227,7 +217,7 @@ Returns distance from a point to line
 
 ```php
 
-$response =  \GeometryLibrary\PolyUtil::distanceToLine(
+$response =  AlexPechkarev\Geometry\Polyline::distanceToLine(
               ['lat' => 61.387002, 'lng' => 23.890636], // point array [lat, lng]
               ['lat' => 61.487002, 'lng' => 23.790636], // line startpoint array [lat, lng]
               ['lat' => 60.48047, 'lng' => 22.052754] // line endpoint array [lat, lng]
@@ -247,7 +237,7 @@ Returns array
 
 ```php
 
-$response =  \GeometryLibrary\PolyUtil::decode('_p~iF~ps|U_ulLnnqC_mqNvxq`@');  
+$response =  AlexPechkarev\Geometry\Polyline::decode('_p~iF~ps|U_ulLnnqC_mqNvxq`@');  
 
   echo $response; /** array (size=3)
                         0 => 
@@ -276,7 +266,7 @@ Returns string
 
 ```php
 
-$response =  \GeometryLibrary\PolyUtil::encode(
+$response =  AlexPechkarev\Geometry\Polyline::encode(
               [ 
                 ['lat' => 38.5, 'lng' => -120.2], 
                 ['lat' => 40.7, 'lng' => -120.95], 
@@ -298,7 +288,7 @@ Returns int
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::computeHeading(
+$response =  AlexPechkarev\Geometry\Sphere::computeHeading(
               ['lat' => 25.775, 'lng' => -80.190], 
               ['lat' => 21.774, 'lng' => -80.190]));
               
@@ -318,7 +308,7 @@ Returns array
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::computeOffset(['lat' => 25.775, 'lng' => -80.190], 152, 120);
+$response =  AlexPechkarev\Geometry\Sphere::computeOffset(['lat' => 25.775, 'lng' => -80.190], 152, 120);
               
   echo $response; /** array (size=2)
                       'lat' => float 25.774316510639
@@ -339,7 +329,7 @@ Returns array
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::computeOffsetOrigin(['lat' => 25.775, 'lng' => -80.190], 152, 120);
+$response =  AlexPechkarev\Geometry\Sphere::computeOffsetOrigin(['lat' => 25.775, 'lng' => -80.190], 152, 120);
               
   echo $response; /** array (size=2)
                         'lat' => float 14.33435503928
@@ -360,7 +350,7 @@ Returns array
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::interpolate(['lat' => 25.775, 'lng' => -80.190], 
+$response =  AlexPechkarev\Geometry\Sphere::interpolate(['lat' => 25.775, 'lng' => -80.190], 
                                                           ['lat' => 26.215, 'lng' => -81.218], 2);
               
   echo $response; /** array (size=2)
@@ -381,7 +371,7 @@ Returns float
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::computeDistanceBetween(['lat' => 25.775, 'lng' => -80.190], ['lat' => 26.215, 'lng' => -81.218]);
+$response =  AlexPechkarev\Geometry\Sphere::computeDistanceBetween(['lat' => 25.775, 'lng' => -80.190], ['lat' => 26.215, 'lng' => -81.218]);
               
   echo $response; //float 113797.92421349
 
@@ -397,7 +387,7 @@ Returns float
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::computeLength([ 
+$response =  AlexPechkarev\Geometry\Sphere::computeLength([ 
                 ['lat' => 38.5, 'lng' => -120.2], 
                 ['lat' => 40.7, 'lng' => -120.95], 
                 ['lat' => 43.252, 'lng' => -126.453]
@@ -417,7 +407,7 @@ Returns float
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::computeArea([ 
+$response =  AlexPechkarev\Geometry\Sphere::computeArea([ 
                 ['lat' => 38.5, 'lng' => -120.2], 
                 ['lat' => 40.7, 'lng' => -120.95], 
                 ['lat' => 43.252, 'lng' => -126.453]
@@ -437,7 +427,7 @@ Returns float
 
 ```php
 
-$response =  \GeometryLibrary\SphericalUtil::computeSignedArea([ 
+$response =  AlexPechkarev\Geometry\Sphere::computeSignedArea([ 
                 ['lat' => 38.5, 'lng' => -120.2], 
                 ['lat' => 40.7, 'lng' => -120.95], 
                 ['lat' => 43.252, 'lng' => -126.453]

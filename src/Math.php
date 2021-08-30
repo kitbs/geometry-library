@@ -1,11 +1,11 @@
 <?php
 
-namespace AlexPechkarev\GeometryLibrary;
+namespace AlexPechkarev\Geometry;
 
 /*
  * Copyright 2013 Google Inc.
  *
- * https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/MathUtil.java
+ * https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/Math.java
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace AlexPechkarev\GeometryLibrary;
  * limitations under the License.
  */
 
-class MathUtil
+class Math
 {
     /**
      * The earth's radius, in meters.

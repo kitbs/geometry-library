@@ -1,11 +1,11 @@
 <?php
 
-namespace AlexPechkarev\GeometryLibrary;
+namespace AlexPechkarev\Geometry;
 
 /*
  * Copyright 2013 Google Inc.
  *
- * https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/SphericalUtil.java
+ * https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/Sphere.java
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace AlexPechkarev\GeometryLibrary;
  * limitations under the License.
  */
 
-class SphericalUtil
+class Sphere
 {
     /**
      * Returns the heading from one LatLng to another LatLng. Headings are
@@ -43,7 +43,7 @@ class SphericalUtil
             cos($fromLat) * sin($toLat) - sin($fromLat) * cos($toLat) * cos($dLng)
         );
 
-        return MathUtil::wrap(rad2deg($heading), -180, 180);
+        return Math::wrap(rad2deg($heading), -180, 180);
     }
 
     /**
@@ -55,7 +55,7 @@ class SphericalUtil
      */
     public static function computeOffset(Point $from, float $distance, float $heading): Point
     {
-        $distance /= MathUtil::$earth_radius;
+        $distance /= Math::$earth_radius;
 
         $heading = deg2rad($heading);
         // http://williams.best.vwh.net/avform.htm#LL
@@ -93,7 +93,7 @@ class SphericalUtil
     public static function computeOffsetOrigin(Point $to, float $distance, float $heading): Point
     {
         $heading = deg2rad($heading);
-        $distance /= MathUtil::$earth_radius;
+        $distance /= Math::$earth_radius;
 
         // http://lists.maptools.org/pipermail/proj/2008-October/003939.html
         $n1 = cos($distance);
@@ -188,7 +188,7 @@ class SphericalUtil
      */
     protected static function distanceRadians(float $lat1, float $lng1, float $lat2, float $lng2): float
     {
-        return MathUtil::arcHav(MathUtil::havDistance($lat1, $lat2, $lng1 - $lng2));
+        return Math::arcHav(Math::havDistance($lat1, $lat2, $lng1 - $lng2));
     }
 
     /**
@@ -210,7 +210,7 @@ class SphericalUtil
      */
     public static function computeDistanceBetween(Point $from, Point $to): float
     {
-        return self::computeAngleBetween($from, $to) * MathUtil::$earth_radius;
+        return self::computeAngleBetween($from, $to) * Math::$earth_radius;
     }
 
     /**
@@ -238,7 +238,7 @@ class SphericalUtil
             $prevLng = $lng;
         }
 
-        return $length * MathUtil::$earth_radius;
+        return $length * Math::$earth_radius;
     }
 
     /**
@@ -260,13 +260,13 @@ class SphericalUtil
      */
     public static function computeSignedArea(Path $path): float
     {
-        return self::computeSignedAreaP($path, MathUtil::$earth_radius);
+        return self::computeSignedAreaP($path, Math::$earth_radius);
     }
 
     /**
      * Returns the signed area of a closed path on a sphere of given radius.
      * The computed area uses the same units as the radius squared.
-     * Used by SphericalUtilTest.
+     * Used by SphereTest.
      */
     protected static function computeSignedAreaP(Path $path, float $radius): float
     {
