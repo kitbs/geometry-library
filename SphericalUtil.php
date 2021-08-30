@@ -27,7 +27,7 @@ class SphericalUtil
     /**
      * Returns the heading from one LatLng to another LatLng. Headings are
      * expressed in degrees clockwise from North within the range [-180,180).
-     * @return The heading in degrees clockwise from north.
+     * @return float The heading in degrees clockwise from north.
      */
     public static function computeHeading($from, $to)
     {
